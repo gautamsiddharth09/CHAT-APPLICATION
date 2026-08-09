@@ -16,10 +16,14 @@ function App() {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
 
+  // Banners for Animated Welcome & Offline/Erase states
+  const [welcomeUser, setWelcomeUser] = useState(null);
+  const [offlineUser, setOfflineUser] = useState(null);
+
   const socketRef = useRef(null);
   const messageEndRef = useRef(null);
 
-  // Create socket when user logs in
+  // Create socket connection
   const socket = useMemo(() => {
     if (!displayName) return null;
 
@@ -36,29 +40,36 @@ function App() {
       setDisplayName(savedName);
     }
   }, []);
-  
 
-  // Socket connection and listeners
+  // Socket event listeners
   useEffect(() => {
     if (!displayName || !socket) return;
 
     socketRef.current = socket;
 
-    // Join chat
+    // Join room
     socket.emit("join", {
       username: displayName,
     });
 
-    // Online users
+    // Active Users List
     socket.on("onlineUsers", (users) => {
       setOnlineUsers(users);
     });
 
-    // User status
+    // Status Handler (Online / Offline Trigger)
     socket.on(
       "userStatus",
       ({ username: user, status: userStatus }) => {
         setStatus(`${user} is ${userStatus}`);
+
+        if (userStatus === "online" || userStatus === "joined") {
+          setWelcomeUser(user);
+          setTimeout(() => setWelcomeUser(null), 4000);
+        } else if (userStatus === "offline" || userStatus === "left") {
+          setOfflineUser(user);
+          setTimeout(() => setOfflineUser(null), 4000);
+        }
 
         setTimeout(() => {
           setStatus("");
@@ -67,21 +78,18 @@ function App() {
     );
 
     // Typing
-    socket.on(
-      "typing",
-      ({ username: user, isTyping }) => {
-        setTypingInfo(
-          isTyping ? `${user} is typing...` : null
-        );
-      }
-    );
+    socket.on("typing", ({ username: user, isTyping }) => {
+      setTypingInfo(
+        isTyping ? `${user} is typing...` : null
+      );
+    });
 
-    // New message
+    // Messages
     socket.on("newMessage", (message) => {
       setMessages((prev) => [...prev, message]);
     });
 
-    // Message read
+    // Message Read Status
     socket.on("messageRead", (message) => {
       setMessages((prev) =>
         prev.map((m) =>
@@ -90,7 +98,7 @@ function App() {
       );
     });
 
-    // Connection error
+    // Connection Error
     socket.on("connect_error", (err) => {
       console.error("Socket connection error:", err);
       setError("Unable to connect to chat server.");
@@ -110,12 +118,12 @@ function App() {
     };
   }, [displayName, socket]);
 
-  // Fetch old messages
+  // Fetch past messages
   useEffect(() => {
     fetchMessages();
   }, []);
 
-  // Mark unread messages as read
+  // Mark messages as read
   useEffect(() => {
     if (!displayName || !socketRef.current) return;
 
@@ -132,14 +140,13 @@ function App() {
     });
   }, [displayName, messages]);
 
-  // Auto scroll to latest message
+  // Auto scroll to bottom
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
 
-  // Fetch messages from backend
   async function fetchMessages() {
     try {
       const response = await axios.get(
@@ -153,7 +160,6 @@ function App() {
     }
   }
 
-  // Send message
   function handleSendMessage(e) {
     e.preventDefault();
 
@@ -184,14 +190,12 @@ function App() {
 
     setInput("");
 
-    // Stop typing
     socketRef.current.emit("typing", {
       username: displayName,
       isTyping: false,
     });
   }
 
-  // Typing handler
   function handleTyping(value) {
     setInput(value);
 
@@ -203,7 +207,6 @@ function App() {
     });
   }
 
-  // Login
   function handleLogin(e) {
     e.preventDefault();
 
@@ -221,7 +224,6 @@ function App() {
     setUsername("");
   }
 
-  // Logout
   function handleLogout() {
     localStorage.removeItem("chatUsername");
 
@@ -236,11 +238,12 @@ function App() {
     setTypingInfo(null);
     setStatus("");
     setError("");
+    setWelcomeUser(null);
+    setOfflineUser(null);
   }
 
   return (
     <div className="app">
-
       {!displayName ? (
         <div className="login-container">
           <form
@@ -266,8 +269,29 @@ function App() {
       ) : (
         <div className="chat-container">
 
-          {/* Main Chat */}
+          {/* Main Chat Interface */}
           <main className="chat-main">
+
+            {/* Top Animated Alert Overlay Banners */}
+            {welcomeUser && (
+              <div className="user-banner welcome-banner">
+                <span className="banner-glow"></span>
+                <span className="banner-icon">✨</span>
+                <div className="banner-text">
+                  <strong>{welcomeUser}</strong> Joined the chat! Welcome
+                </div>
+              </div>
+            )}
+
+            {offlineUser && (
+              <div className="user-banner erase-banner">
+                <div className="erase-beam"></div>
+                <span className="banner-icon">⚡</span>
+                <div className="banner-text">
+                  <strong>{offlineUser}</strong> Left the chat (Disconnecting...)
+                </div>
+              </div>
+            )}
 
             {/* Header */}
             <header className="chat-header">
@@ -294,13 +318,13 @@ function App() {
               </div>
             </header>
 
-            {/* Messages */}
+            {/* Messages Content */}
             <section className="chat-content">
               <div className="messages-list">
 
-                {messages.map((msg) => (
+                {messages.map((msg, index) => (
                   <article
-                    key={msg._id}
+                    key={msg._id || index}
                     className={
                       msg.sender === displayName
                         ? "message own"
@@ -347,7 +371,7 @@ function App() {
               </div>
             </section>
 
-            {/* Message Composer */}
+            {/* Composer */}
             <form
               className="composer"
               onSubmit={handleSendMessage}
@@ -366,14 +390,14 @@ function App() {
               </button>
             </form>
 
-            {/* Error */}
+            {/* Errors */}
             {error && (
               <div className="error-box">
                 {error}
               </div>
             )}
 
-            {/* Status */}
+            {/* Status Info */}
             {status && (
               <div className="info-box">
                 {status}
@@ -382,14 +406,14 @@ function App() {
 
           </main>
 
-          {/* Sidebar */}
+          {/* Active Sidebar */}
           <aside className="sidebar">
             <div className="sidebar-card">
               <h2>Active users</h2>
 
               <ul>
-                {onlineUsers.map((user) => (
-                  <li key={user}>
+                {onlineUsers.map((user, idx) => (
+                  <li key={`${user}-${idx}`}>
                     {user}
                   </li>
                 ))}
