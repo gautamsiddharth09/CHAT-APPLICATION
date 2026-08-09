@@ -52,9 +52,7 @@ body {
   padding: 20px;
 }
 
-/* =========================================================
-   ANIMATED OVERLAY BANNERS (WELCOME & OFFLINE / ERASE)
-   ========================================================= */
+
 
 .user-banner {
   position: absolute;
@@ -199,9 +197,6 @@ body {
   }
 }
 
-/* =========================================================
-   CORE INTERFACE STYLES
-   ========================================================= */
 
 .login-container {
   width: 100%;
@@ -638,19 +633,19 @@ body {
 
 
 
-/* Container adjustments to force a single row layout */
+
 .banner-icon-svg {
   display: flex;
   align-items: center;
   justify-content: center;
   color: #4ade80;
   animation: pulseScale 1.5s ease-in-out infinite;
-  flex-shrink: 0; /* Prevents icon shrinking on small screens */
+  flex-shrink: 0; 
 }
 
 .banner-icon-svg svg {
   filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.8));
-  width: 18px;  /* Compact size for mobile */
+  width: 18px; 
   height: 18px;
 }
 
@@ -679,7 +674,7 @@ body {
   height: 18px;
 }
 
-/* Disconnect Status Tag - Single Line Optimized */
+/* Disconnect Status Tag  */
 .disconnect-tag {
   display: inline-flex;
   align-items: center;
@@ -693,21 +688,21 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 12px;
   color: #f87171;
-  white-space: nowrap; /* Prevents tag wrapping */
+  white-space: nowrap; 
   flex-shrink: 0;
 }
 
-/* Parent Banner Class (Apply this to banner wrapper) */
+/* Parent Banner Class  */
 .banner-container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   width: 100%;
-  max-width: 90vw; /* Bounds width on mobile */
-  white-space: nowrap; /* Forces text to stay on one line */
+  max-width: 90vw;
+  white-space: nowrap; 
   overflow: hidden;
-  text-overflow: ellipsis; /* Truncates extra text gracefully */
+  text-overflow: ellipsis; 
   padding: 6px 12px;
 }
 
@@ -715,7 +710,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.8rem; /* Slightly reduced for narrow screens */
+  font-size: 0.8rem; 
 }
 
 /* Glitch Shake Animation */

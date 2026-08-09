@@ -57,7 +57,7 @@ function App() {
       setOnlineUsers(users);
     });
 
-    // Status Handler (Online / Offline Trigger)
+    // Status Handler (Online / Offline )
     socket.on("userStatus", ({ username: user, status: userStatus }) => {
       setStatus(`${user} is ${userStatus}`);
 
@@ -300,7 +300,7 @@ function App() {
             {/* Header */}
             <header className="chat-header">
               <div>
-                <h1>Live Chat</h1>
+                <h1>WhoNext</h1>
 
                 <p>
                   Logged in as <strong>{displayName}</strong>
