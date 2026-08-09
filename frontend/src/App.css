@@ -635,3 +635,70 @@ body {
     max-width: 80%;
   }
 }
+
+
+
+
+/* Animated Sparkle Icon CSS */
+.banner-icon-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4ade80;
+  animation: pulseScale 1.5s ease-in-out infinite;
+}
+
+.banner-icon-svg svg {
+  filter: drop-shadow(0 0 6px rgba(74, 222, 128, 0.8));
+}
+
+@keyframes pulseScale {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.25) rotate(15deg);
+  }
+}
+
+
+/* Disconnect Icon Styling & Animation */
+.banner-icon-svg.disconnect-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fca5a5;
+  animation: glitchShake 0.4s ease-in-out infinite alternate;
+}
+
+.banner-icon-svg.disconnect-icon svg {
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.7));
+}
+
+/* Disconnect Status Tag */
+.disconnect-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  color: #f87171;
+}
+
+/* Subtle Disconnect Shake Effect */
+@keyframes glitchShake {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-1px) scale(0.95);
+  }
+  100% {
+    transform: translateX(1px) scale(1.05);
+  }
+}
